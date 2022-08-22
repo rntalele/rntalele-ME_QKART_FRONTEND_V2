@@ -32,8 +32,8 @@ const Products = () => {
   const [products,setProducts] = useState();
   const [isLoading,setIsLoading] = useState(false);
   const {enqueueSnackbar} = useSnackbar();
-  const [searchText,setSearchText] = useState();
   const [notFound,setNotFound] = useState(false);
+  const [debounceTimeout,setDebounceTimeout] = useState();
 
   useEffect(()=>{
     performAPICall();
@@ -141,10 +141,17 @@ const Products = () => {
    *
    */
   const debounceSearch = (event, debounceTimeout) => {
-    let timerId;
-    
-    clearTimeout(timerId);
-    timerId = setTimeout(()=>{performSearch(event.target.value)},debounceTimeout);
+    const value = event.target.value;
+
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    const timeout = setTimeout(() => {
+      performSearch(value);
+    }, debounceTimeout);
+
+    setDebounceTimeout(timeout);
 
     
     
