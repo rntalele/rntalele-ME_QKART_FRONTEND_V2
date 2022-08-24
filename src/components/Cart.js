@@ -3,6 +3,7 @@ import {
   RemoveOutlined,
   ShoppingCart,
   ShoppingCartOutlined,
+  Tune,
 } from "@mui/icons-material";
 import { Button, IconButton, Stack } from "@mui/material";
 import { Box } from "@mui/system";
@@ -96,6 +97,7 @@ export const getTotalCartValue = (items = []) => {
  *
  */
 export const getTotalItems = (items = []) => {
+  return items.length
 };
 
 // TODO: CRIO_TASK_MODULE_CHECKOUT - Add static quantity view for Checkout page cart
@@ -120,14 +122,17 @@ const ItemQuantity = ({
   handleAdd,
   handleDelete,
 }) => {
+  console.log('itemquantity called');
   return (
     <Stack direction="row" alignItems="center">
+      
       <IconButton size="small" color="primary" onClick={handleDelete}>
         <RemoveOutlined />
       </IconButton>
       <Box padding="0.5rem" data-testid="item-qty">
         {value}
       </Box>
+      
       <IconButton size="small" color="primary" onClick={handleAdd}>
         <AddOutlined />
       </IconButton>
@@ -155,6 +160,7 @@ const Cart = ({
   products,
   items = [],
   handleQuantity,
+  isReadOnly
 }) => {
   const history = useHistory();
 
@@ -202,12 +208,18 @@ const Cart = ({
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                <ItemQuantity
-                value={item.qty}
-                handleDelete={()=>handleQuantity(localStorage.getItem('token'),items,products,item.productId,item.qty-1)}
-                handleAdd={()=>handleQuantity(localStorage.getItem('token'),items,products,item.productId,item.qty+1)}
-                // Add required props by checking implementation
-                />
+                  { !isReadOnly ?
+                        <ItemQuantity
+                        value={item.qty}
+                        handleDelete={()=>handleQuantity(localStorage.getItem('token'),items,products,item.productId,item.qty-1)}
+                        handleAdd={()=>handleQuantity(localStorage.getItem('token'),items,products,item.productId,item.qty+1)}
+                        // Add required props by checking implementation
+                        />
+                        :
+                      <Box padding="0.5rem" data-testid="item-qty">
+                        Qty: {item.qty}
+                      </Box>
+                  }
                 <Box padding="0.5rem" fontWeight="700">
                     ${item.cost}
                 </Box>
@@ -238,6 +250,7 @@ const Cart = ({
         </Box>
 
         <Box display="flex" justifyContent="flex-end" className="cart-footer">
+          {!isReadOnly && 
           <Button
             color="primary"
             variant="contained"
@@ -246,9 +259,51 @@ const Cart = ({
             onClick={()=>history.push('/checkout')}
           >
             Checkout
-          </Button>
+          </Button>}
         </Box>
       </Box>
+       {isReadOnly && 
+        <Box className='cart' padding='1rem'>
+            <Box>
+              <h3>Order Details</h3>
+            </Box>
+            <Box
+              display="flex"
+              alignItems="flex-start"
+              justifyContent="space-between"
+              paddingY="0.5rem"
+            >
+              <Box>Products</Box>
+              <Box>{getTotalItems(items)}</Box>
+            </Box>
+            <Box
+              display="flex"
+              alignItems="flex-start"
+              justifyContent="space-between"
+              paddingY="0.5rem"
+            >
+              <Box>Subtotal</Box>
+              <Box>${getTotalCartValue(items)}</Box>
+            </Box>
+            <Box
+              display="flex"
+              alignItems="flex-start"
+              justifyContent="space-between"
+              paddingY="0.5rem"
+            >
+              <Box>Shipping Charges</Box>
+              <Box>$0</Box>
+            </Box>
+            <Box
+              display="flex"
+              alignItems="flex-start"
+              justifyContent="space-between"
+              paddingY="0.5rem"
+            >
+              <Box><strong>Total</strong></Box>
+              <Box><strong>${getTotalCartValue(items)}</strong></Box>
+            </Box>
+        </Box>}
     </>
   );
 };
