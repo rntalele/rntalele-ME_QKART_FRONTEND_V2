@@ -256,7 +256,7 @@ const Checkout = () => {
   const addAddress = async (token, newAddress) => {
     try {
       // TODO: CRIO_TASK_MODULE_CHECKOUT - Add new address to the backend and display the latest list of addresses
-      console.log(newAddress);
+      // console.log(newAddress);
       let res = await axios.post(config.endpoint+'/user/addresses',{address:newAddress.value},{
         headers:{
           'Authorization':`Bearer ${token}`,
